@@ -38,6 +38,7 @@ def partition(x):
       ...
       vk: indices of x == vk }, where [v1, ... vk] are all the unique values in the vector z.
     """
+    
 
     # INSERT YOUR CODE HERE
     raise Exception('Function not yet implemented!')
@@ -49,6 +50,14 @@ def entropy(y):
 
     Returns the entropy of z: H(z) = p(z=v1) log2(p(z=v1)) + ... + p(z=vk) log2(p(z=vk))
     """
+    value,count = np.unique(y,return_counts = True)
+    p = count.astype('float')/len(y)
+    hy = 0.0
+    for k in np.nditer(p,op_flags = ['readwrite']):
+    	hy+=(- k)*(math.log(k)/math.log(2))
+    	
+    return hy
+    
 
     # INSERT YOUR CODE HERE
     raise Exception('Function not yet implemented!')
