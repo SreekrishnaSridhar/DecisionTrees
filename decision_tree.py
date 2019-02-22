@@ -26,6 +26,7 @@
 # the package scikit-learn OR ANY OTHER machine learning package in THIS file.
 
 import numpy as np
+import math
 
 
 def partition(x):
@@ -71,7 +72,15 @@ def mutual_information(x, y):
 
     Returns the mutual information: I(x, y) = H(y) - H(y | x)
     """
-
+	valuex, countx = np.unique(x,return_counts = True)
+	px = countx.astype('float')/len(x)
+	hyx = 0.0
+	yuniqueval, county = np.unique(y, return_counts = True)
+	for  pxval,xval in zip(px,valuex):
+		hyx+=(px)*entropy(y[x==xval])
+	hy  = entropy(y)
+	ixy = hy -hyx
+	return ixy
     # INSERT YOUR CODE HERE
     raise Exception('Function not yet implemented!')
 
