@@ -39,7 +39,8 @@ def partition(x):
       ...
       vk: indices of x == vk }, where [v1, ... vk] are all the unique values in the vector z.
     """
-    
+    s = {v:(x==v).nonzero()[0] for v in np.unique(x)}
+    return s
 
     # INSERT YOUR CODE HERE
     raise Exception('Function not yet implemented!')
@@ -136,8 +137,13 @@ def id3(x, y, attribute_value_pairs=None, depth=0, max_depth=5):
     if(len(attribute_value_pairs)==0) or depth == max_depth: #2nd and 3rd terminating condition
      return yvalues[np.argmax(ycounts)]
      
-     ListOfMutualInformation = np.array([mutual_information(np.array(x[:,i]==v),y) for (i,v) in attribute_value_pairs])
+     
+     # Best v attribute and value
+     # astype to get 0/1 values. Default is true or false.
+     ListOfMutualInformation = np.array([mutual_information(np.array(x[:,i]==v).astype(int),y) for (i,v) in attribute_value_pairs])
      (bestattr,bestval) = attribute_value_pair[np.argmax(ListofMutualInformation)]
+     
+     partition = partition(np.array(x[:,bestattr]==bestval).astype(int))
      
     
      
