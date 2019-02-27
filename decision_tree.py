@@ -148,6 +148,14 @@ def id3(x, y, attribute_value_pairs=None, depth=0, max_depth=5):
      dropIndex = np.all(attribute_value_pairs==(bestattr,bestvalue), axis = 1)
      attribute_value_pairs = np.delete(attribute_value_pairs,np.argwhere(dropIndex),0)
      
+     for splitIndex, indices in partitioning.items():
+      xsubset = x.take(indices,axis = 0)
+      ysubset = y.take(indices,axis = 0)
+      decision = bool(splitIndex)
+      root[(bestattr,bestval,decision)] = id3(xsubset,ysubset,attribute_value_pairs,depth = depth+1,max_depth)
+      
+     return root
+     
     
      
 
