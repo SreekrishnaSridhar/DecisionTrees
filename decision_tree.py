@@ -130,10 +130,12 @@ def id3(x, y, attribute_value_pairs=None, depth=0, max_depth=5):
       
     yvalues, ycounts = np.unique(y, return_counts = True)
     
-    if(len(yvalues)==1):
+    if(len(yvalues)==1): #1st terminating condition
      return yvalues[0]
      
-    
+    if(len(attribute_value_pairs)==0): #2nd terminating condition
+     return yvalues[np.argmax(ycounts)]
+     
 
     # INSERT YOUR CODE HERE. NOTE: THIS IS A RECURSIVE FUNCTION.
     raise Exception('Function not yet implemented!')
