@@ -136,6 +136,9 @@ def id3(x, y, attribute_value_pairs=None, depth=0, max_depth=5):
     if(len(attribute_value_pairs)==0) or depth == max_depth: #2nd and 3rd terminating condition
      return yvalues[np.argmax(ycounts)]
      
+     ListOfMutualInformation = np.array([mutual_information(np.array(x[:,i]==v),y) for (i,v) in attribute_value_pairs])
+     (bestattr,bestval) = attribute_value_pair[np.argmax(ListofMutualInformation)]
+     
     
      
 
