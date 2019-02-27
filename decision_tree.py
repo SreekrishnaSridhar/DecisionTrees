@@ -76,7 +76,7 @@ def mutual_information(x, y):
 	px = countx.astype('float')/len(x)
 	hyx = 0.0
 	for  pxval,xval in zip(px,valuex):
-		hyx+=(px)*entropy(y[x==xval])
+		hyx+=(pxval)*entropy(y[x==xval])
 	hy  = entropy(y)
 	ixy = hy -hyx
 	return ixy
