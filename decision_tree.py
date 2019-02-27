@@ -143,7 +143,10 @@ def id3(x, y, attribute_value_pairs=None, depth=0, max_depth=5):
      ListOfMutualInformation = np.array([mutual_information(np.array(x[:,i]==v).astype(int),y) for (i,v) in attribute_value_pairs])
      (bestattr,bestval) = attribute_value_pair[np.argmax(ListofMutualInformation)]
      
-     partition = partition(np.array(x[:,bestattr]==bestval).astype(int))
+     partitioning = partition(np.array(x[:,bestattr]==bestval).astype(int))
+     
+     dropIndex = np.all(attribute_value_pairs==(bestattr,bestvalue), axis = 1)
+     attribute_value_pairs = np.delete(attribute_value_pairs,np.argwhere(dropIndex),0)
      
     
      
