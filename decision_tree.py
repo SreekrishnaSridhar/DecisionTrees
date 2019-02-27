@@ -124,6 +124,9 @@ def id3(x, y, attribute_value_pairs=None, depth=0, max_depth=5):
              (1, 1, True): 1}},
      (4, 1, True): 1}
     """
+    root = {}
+    if attribute_value_pairs is None:
+     attribute_value_pairs= np.vstack([[(i,v) for v in np.unique(x[:,i])] for i in range(x.shape[1])])
 
     # INSERT YOUR CODE HERE. NOTE: THIS IS A RECURSIVE FUNCTION.
     raise Exception('Function not yet implemented!')
