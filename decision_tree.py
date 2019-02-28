@@ -66,13 +66,14 @@ def entropy(y):
 
 
 def mutual_information(x, y):
-    """
-    Compute the mutual information between a data column (x) and the labels (y). The data column is a single attribute
-    over all the examples (n x 1). Mutual information is the difference between the entropy BEFORE the split set, and
-    the weighted-average entropy of EACH possible split.
+	"""
+	Compute the mutual information between a data column (x) and the labels (y). The data column is a single attribute
+	over all the examples (n x 1). Mutual information is the difference between the entropy BEFORE the split set, and
+	the weighted-average entropy of EACH possible split.
 
-    Returns the mutual information: I(x, y) = H(y) - H(y | x)
-    """
+	Returns the mutual information: I(x, y) = H(y) - H(y | x)
+	"""
+    
 	valuex, countx = np.unique(x,return_counts = True)
 	px = countx.astype('float')/len(x)
 	hyx = 0.0
@@ -82,49 +83,10 @@ def mutual_information(x, y):
 	ixy = hy -hyx
 	return ixy
     # INSERT YOUR CODE HERE
-    raise Exception('Function not yet implemented!')
+	raise Exception('Function not yet implemented!')
 
 
 def id3(x, y, attribute_value_pairs=None, depth=0, max_depth=5):
-    """
-    Implements the classical ID3 algorithm given training data (x), training labels (y) and an array of
-    attribute-value pairs to consider. This is a recursive algorithm that depends on three termination conditions
-        1. If the entire set of labels (y) is pure (all y = only 0 or only 1), then return that label
-        2. If the set of attribute-value pairs is empty (there is nothing to split on), then return the most common
-           value of y (majority label)
-        3. If the max_depth is reached (pre-pruning bias), then return the most common value of y (majority label)
-    Otherwise the algorithm selects the next best attribute-value pair using INFORMATION GAIN as the splitting criterion
-    and partitions the data set based on the values of that attribute before the next recursive call to ID3.
-
-    The tree we learn is a BINARY tree, which means that every node has only two branches. The splitting criterion has
-    to be chosen from among all possible attribute-value pairs. That is, for a problem with two features/attributes x1
-    (taking values a, b, c) and x2 (taking values d, e), the initial attribute value pair list is a list of all pairs of
-    attributes with their corresponding values:
-    [(x1, a),
-     (x1, b),
-     (x1, c),
-     (x2, d),
-     (x2, e)]
-     If we select (x2, d) as the best attribute-value pair, then the new decision node becomes: [ (x2 == d)? ] and
-     the attribute-value pair (x2, d) is removed from the list of attribute_value_pairs.
-
-    The tree is stored as a nested dictionary, where each entry is of the form
-                    (attribute_index, attribute_value, True/False): subtree
-    * The (attribute_index, attribute_value) determines the splitting criterion of the current node. For example, (4, 2)
-    indicates that we test if (x4 == 2) at the current node.
-    * The subtree itself can be nested dictionary, or a single label (leaf node).
-    * Leaf nodes are (majority) class labels
-
-    Returns a decision tree represented as a nested dictionary, for example
-    {(4, 1, False):
-        {(0, 1, False):
-            {(1, 1, False): 1,
-             (1, 1, True): 0},
-         (0, 1, True):
-            {(1, 1, False): 0,
-             (1, 1, True): 1}},
-     (4, 1, True): 1}
-    """
     root = {}
     if attribute_value_pairs is None:
      attribute_value_pairs= np.vstack([[(i,v) for v in np.unique(x[:,i])] for i in range(x.shape[1])])
@@ -141,26 +103,23 @@ def id3(x, y, attribute_value_pairs=None, depth=0, max_depth=5):
      # Best v attribute and value
      # astype to get 0/1 values. Default is true or false.
      ListOfMutualInformation = np.array([mutual_information(np.array(x[:,i]==v).astype(int),y) for (i,v) in attribute_value_pairs])
-     (bestattr,bestval) = attribute_value_pair[np.argmax(ListofMutualInformation)]
-     
+     (bestattr,bestval) = attribute_value_pairs[np.argmax(ListofMutualInformation)]
+     # Based on best attribute and value, splitting in true or false
      partitioning = partition(np.array(x[:,bestattr]==bestval).astype(int))
-     
+     # Removing the best attribute and value to split on
      dropIndex = np.all(attribute_value_pairs==(bestattr,bestvalue), axis = 1)
      attribute_value_pairs = np.delete(attribute_value_pairs,np.argwhere(dropIndex),0)
-     
+     # Removing those values that were split on  and recursively calling with the new data.
      for splitIndex, indices in partitioning.items():
       xsubset = x.take(indices,axis = 0)
       ysubset = y.take(indices,axis = 0)
       decision = bool(splitIndex)
-      root[(bestattr,bestval,decision)] = id3(xsubset,ysubset,attribute_value_pairs,depth = depth+1,max_depth)
+      root[(bestattr,bestval,decision)] = id3(xsubset,ysubset,attribute_value_pairs = attribute_value_pairs,max_depth = max_depth, depth = depth+1)
+      print(root)
       
      return root
-     
-    
-     
-
     # INSERT YOUR CODE HERE. NOTE: THIS IS A RECURSIVE FUNCTION.
-    raise Exception('Function not yet implemented!')
+     raise Exception('Function not yet implemented!')
 
 
 def predict_example(x, tree):
@@ -170,6 +129,16 @@ def predict_example(x, tree):
 
     Returns the predicted label of x according to tree
     """
+    for criteria, subtree in tree.items():
+     attribute = criteria[0]
+     value = criteria[1]
+     decision = criteria[2]
+     if decision == (x[attribute]== value):
+      if type(subtree) is dict:
+       label = predict_example(x,subtree)
+      else:
+       label = subtree
+     return label
 
     # INSERT YOUR CODE HERE. NOTE: THIS IS A RECURSIVE FUNCTION.
     raise Exception('Function not yet implemented!')
@@ -181,7 +150,9 @@ def compute_error(y_true, y_pred):
 
     Returns the error = (1/n) * sum(y_true != y_pred)
     """
-
+    size = len(y_true)
+    err = [y_true[i]!=y_pred[i] for i in range(n)]
+    return sum(err)/n
     # INSERT YOUR CODE HERE
     raise Exception('Function not yet implemented!')
 
@@ -213,17 +184,19 @@ def visualize(tree, depth=0):
 
 if __name__ == '__main__':
     # Load the training data
-    M = np.genfromtxt('./monks-1.train', missing_values=0, skip_header=0, delimiter=',', dtype=int)
+    M = np.genfromtxt('/Users/sreekrishnasridhar/Desktop/data/monks-1.train', missing_values=0, skip_header=0, delimiter=',', dtype=int)
     ytrn = M[:, 0]
     Xtrn = M[:, 1:]
 
     # Load the test data
-    M = np.genfromtxt('./monks-1.test', missing_values=0, skip_header=0, delimiter=',', dtype=int)
+    M = np.genfromtxt('/Users/sreekrishnasridhar/Desktop/data//monks-1.test', missing_values=0, skip_header=0, delimiter=',', dtype=int)
     ytst = M[:, 0]
     Xtst = M[:, 1:]
 
     # Learn a decision tree of depth 3
     decision_tree = id3(Xtrn, ytrn, max_depth=3)
+    print(decision_tree)
+    
     visualize(decision_tree)
 
     # Compute the test error
